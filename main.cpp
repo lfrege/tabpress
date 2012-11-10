@@ -115,10 +115,12 @@ const int MODE_COMMENT1 = 2;
 const int MODE_WHITESPACE = 3;
 const int MODE_COMMENT2 = 4;
 const int MODE_STRING2 = 5;
+const int MODE_ARG = 6;
 
 int main (int argc, char ** argv)
 {
 	int i;
+	int parcount = 0;
 	int mode = MODE_CODE;
 	char ch;
 	vector<statement*> stack;
@@ -177,6 +179,12 @@ int main (int argc, char ** argv)
 				stack.back()->last().str += ch;
 				mode = MODE_STRING2;
 			}
+			else if (ch == '(')
+			{
+				parcount = 1;
+				stack.back()->last().str += ch;
+				mode = MODE_ARG;
+			}
 			else
 			{
 				stack.back()->last().str += ch;
@@ -190,6 +198,34 @@ int main (int argc, char ** argv)
 				mode = MODE_CODE;
 			}
 		}
+		else if (mode == MODE_ARG)
+		{
+			if (ch == '\n')
+			{
+				mode = MODE_CODE;
+			}
+			else if (ch == '(')
+			{
+				parcount++;
+			}
+			else if (ch == ')')
+			{
+				parcount--;
+			}
+			else if (ch == '\'')
+			{
+				mode = MODE_STRING1;
+			}
+			else if (ch == '"')
+			{
+				mode = MODE_STRING2;
+			}
+			if (parcount <= 0)
+			{
+				mode = MODE_CODE;
+			}
+			stack.back()->last().str += ch;
+		}
 		else if (mode == MODE_STRING1)
 		{
 			if (ch == '\\' && data.length() - i > 2)
@@ -201,7 +237,14 @@ int main (int argc, char ** argv)
 			else if (ch == '\'')
 			{
 				stack.back()->last().str += ch;
-				mode = MODE_CODE;
+				if (parcount <= 0)
+				{
+					mode = MODE_CODE;
+				}
+				else
+				{
+					mode = MODE_ARG;
+				}
 			}
 			else
 			{
@@ -219,7 +262,14 @@ int main (int argc, char ** argv)
 			else if (ch == '\"')
 			{
 				stack.back()->last().str += ch;
-				mode = MODE_CODE;
+				if (parcount <= 0)
+				{
+					mode = MODE_CODE;
+				}
+				else
+				{
+					mode = MODE_ARG;
+				}
 			}
 			else
 			{
