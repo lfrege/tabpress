@@ -67,6 +67,7 @@ class statement
 	{
 		stringstream output;
 		string tabs = "";
+		string tempstmt = "";
 		int i;
 
 		for (i = 0; i < layer; i++) { tabs += "\t"; }
@@ -89,10 +90,14 @@ class statement
 
 			for (i = 0; i < (int)subs.size(); i++)
 			{
-				output << subs[i].toString() << endl;
+				tempstmt = subs[i].toString();
+				if (trim(tempstmt) != "")
+				{
+					output << tempstmt << endl;
+				}
 			}
 
-			output << tabs << "}";
+			output << tabs << "}" << endl;
 		}
 
 		return output.str();
@@ -110,8 +115,6 @@ const int MODE_COMMENT1 = 2;
 const int MODE_WHITESPACE = 3;
 const int MODE_COMMENT2 = 4;
 const int MODE_STRING2 = 5;
-
-//This is a comment
 
 int main (int argc, char ** argv)
 {
