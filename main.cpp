@@ -80,7 +80,7 @@ class statement
 
 		if (comment.length() != 0)
 		{
-			output << tabs << "/*" << comment << "*/\n";
+			output << tabs << "/* " << trim(comment) << " */\n";
 		}
 
 		if (subs.size() != 0)
@@ -105,11 +105,13 @@ class statement
 };
 
 const int MODE_CODE = 0;
-const int MODE_STRING = 1;
+const int MODE_STRING1 = 1;
 const int MODE_COMMENT1 = 2;
 const int MODE_WHITESPACE = 3;
 const int MODE_COMMENT2 = 4;
+const int MODE_STRING2 = 5;
 
+//This is a comment
 
 int main (int argc, char ** argv)
 {
@@ -134,12 +136,14 @@ int main (int argc, char ** argv)
 			}
 			else if (ch == '/')
 			{
-				if (data.length() - i > 2 && data.c_str()[i+1] == '/')
+				if (data.length() - i > 2 && data.c_str()[i+1] == '*')
 				{
+					i++;
 					mode = MODE_COMMENT1;
 				}
 				else if (data.length() - i > 2 && data.c_str()[i+1] == '/')
 				{
+					i++;
 					mode = MODE_COMMENT2;
 				}
 				else
@@ -160,9 +164,15 @@ int main (int argc, char ** argv)
 				stack.pop_back();
 				stack.back()->nextStmt();
 			}
-			else if (ch == '"')
+			else if (ch == '\'')
 			{
-				stack.back()->last().str += '"';
+				stack.back()->last().str += ch;
+				mode = MODE_STRING1;
+			}
+			else if (ch == '\"')
+			{
+				stack.back()->last().str += ch;
+				mode = MODE_STRING2;
 			}
 			else
 			{
@@ -177,7 +187,7 @@ int main (int argc, char ** argv)
 				mode = MODE_CODE;
 			}
 		}
-		else if (mode == MODE_STRING)
+		else if (mode == MODE_STRING1)
 		{
 			if (ch == '\\' && data.length() - i > 2)
 			{
@@ -185,7 +195,25 @@ int main (int argc, char ** argv)
 				i++;
 				stack.back()->last().str += data.c_str()[i];
 			}
-			else if (ch == '"')
+			else if (ch == '\'')
+			{
+				stack.back()->last().str += ch;
+				mode = MODE_CODE;
+			}
+			else
+			{
+				stack.back()->last().str += ch;
+			}
+		}
+		else if (mode == MODE_STRING2)
+		{
+			if (ch == '\\' && data.length() - i > 2)
+			{
+				stack.back()->last().str += ch;
+				i++;
+				stack.back()->last().str += data.c_str()[i];
+			}
+			else if (ch == '\"')
 			{
 				stack.back()->last().str += ch;
 				mode = MODE_CODE;
