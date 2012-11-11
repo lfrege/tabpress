@@ -44,6 +44,7 @@ string trim(const string& str)
 class statement
 {
 	protected: int layer;
+	bool pre;
 	public: string str;
 	string comment;
 	vector<statement> subs;
@@ -88,7 +89,7 @@ class statement
 		}
 
 		output << tabs << trim(str);
-		if (subs.size() == 0)
+		if (subs.size() == 0 && !isPre())
 		{
 			output << ";";
 		}
@@ -134,9 +135,20 @@ class statement
 		return output.str();
 	}
 
+	bool isPre() const
+	{
+		return pre;
+	}
+
+	void setPre()
+	{
+		pre = true;
+	}
+
 	statement()
 	{
 		layer = -1;
+		pre = false;
 	}
 };
 
@@ -162,10 +174,25 @@ int main (int argc, char ** argv)
 		ch = data.c_str()[i];
 		if (mode == MODE_CODE)
 		{
-			if (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t')
+			if (stack.back()->last().isPre() && ch == '\n')
+			{
+				stack.back()->nextStmt();
+			}
+
+			else if (ch == ' ' || ch == '\n' || ch == '\r' || ch == '\t')
 			{
 				stack.back()->last().str += ' ';
 				mode = MODE_WHITESPACE;
+			}
+
+			else if (ch == '#')
+			{
+				if (trim(stack.back()->last().str) == "")
+				{
+					stack.back()->last().setPre();
+				}
+
+				stack.back()->last().str += ch;
 			}
 
 			else if (ch == '/')
