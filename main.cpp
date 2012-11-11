@@ -1,9 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-
 using namespace std;
-
 string getFullStream(istream& is)
 {
 	stringstream ss;
@@ -123,6 +121,11 @@ class statement
 			}
 
 			if (i + 1 != (int)subs.size() && (int)subs[i].subs.size() > 0 && trim(subs[i+1].str) != "")
+			{
+				output << '\n';
+			}
+
+			if (trim(subs[i].str) == "")
 			{
 				output << '\n';
 			}
@@ -358,7 +361,7 @@ int main (int argc, char ** argv)
 	}
 
 	top.clean();
-	cout << top.innerString();
+	cout << top.innerString() << '\n';
 	return 0;
 }
 
