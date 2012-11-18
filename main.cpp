@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <fstream>
 using namespace std;
 string getFullStream(istream& is)
 {
@@ -166,9 +167,32 @@ int main (int argc, char ** argv)
 	int mode = MODE_CODE;
 	char ch;
 	vector<statement*> stack;
-	string data = getFullStream(cin);
+	ifstream ifs;
+	ofstream ofs;
+	string data; 
+
 	statement top;
 	stack.push_back(&top);
+
+	if (argc > 1)
+	{
+		ifs.open(argv[1]);
+
+		if (!ifs.is_open())
+		{
+			cerr << "Error: Cannot open file:" << argv[1] << endl;
+			return -1;
+		}
+
+		
+		data = getFullStream(ifs);
+		ifs.close();
+	}
+	else
+	{
+		data = getFullStream(cin);
+	}
+
 	for (i = 0; i < (int)data.length(); i++)
 	{
 		ch = data.c_str()[i];
@@ -388,7 +412,17 @@ int main (int argc, char ** argv)
 	}
 
 	top.clean();
-	cout << top.innerString() << '\n';
+
+	if (argc > 1)
+	{
+		ofs.open(argv[1]);
+		ofs << top.innerString() << '\n';
+		ofs.close();
+	}
+	else
+	{
+		cout << top.innerString() << '\n';
+	}
 	return 0;
 }
 
