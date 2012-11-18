@@ -169,25 +169,22 @@ int main (int argc, char ** argv)
 	vector<statement*> stack;
 	ifstream ifs;
 	ofstream ofs;
-	string data; 
-
+	string data;
 	statement top;
 	stack.push_back(&top);
-
 	if (argc > 1)
 	{
 		ifs.open(argv[1]);
-
 		if (!ifs.is_open())
 		{
 			cerr << "Error: Cannot open file:" << argv[1] << endl;
 			return -1;
 		}
 
-		
 		data = getFullStream(ifs);
 		ifs.close();
 	}
+
 	else
 	{
 		data = getFullStream(cin);
@@ -412,17 +409,18 @@ int main (int argc, char ** argv)
 	}
 
 	top.clean();
-
 	if (argc > 1)
 	{
 		ofs.open(argv[1]);
 		ofs << top.innerString() << '\n';
 		ofs.close();
 	}
+
 	else
 	{
 		cout << top.innerString() << '\n';
 	}
+
 	return 0;
 }
 
